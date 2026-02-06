@@ -18,11 +18,8 @@ public class CentroProduccionPersistenceAdapter implements CentroProduccionRepos
     }
 
     @Override
-    public Page<CentroProduccion> findAll(String nombre, Pageable pageable) {
-        if (nombre == null || nombre.isBlank()) {
-            return repository.findAll(pageable).map(CentroProduccionMapper::toDomain);
-        }
-        return repository.findByNomCentroPrdContainingIgnoreCase(nombre, pageable)
+    public Page<CentroProduccion> findAll(String codigo, String nombre, Pageable pageable) {
+        return repository.search(codigo, nombre, pageable)
                 .map(CentroProduccionMapper::toDomain);
     }
 }

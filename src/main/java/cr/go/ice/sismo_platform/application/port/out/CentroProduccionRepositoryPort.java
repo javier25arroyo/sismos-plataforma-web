@@ -5,5 +5,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CentroProduccionRepositoryPort {
-    Page<CentroProduccion> findAll(String nombre, Pageable pageable);
+    Page<CentroProduccion> findAll(String codigo, String nombre, Pageable pageable);
 }

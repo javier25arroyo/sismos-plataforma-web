@@ -17,7 +17,7 @@ public class CentroProduccionService implements CentroProduccionQuery {
     }
 
     @Override
-    public Page<CentroProduccion> listarCentros(String nombre, Pageable pageable) {
-        return repository.findAll(nombre, pageable);
+    public Page<CentroProduccion> listarCentros(String codigo, String nombre, Pageable pageable) {
+        return repository.findAll(codigo, nombre, pageable);
     }
 }

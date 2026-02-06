@@ -17,7 +17,16 @@ public class EstacionService implements EstacionQuery {
     }
 
     @Override
-    public Page<Estacion> listarPorCentro(String codigoCentro, String nombre, Pageable pageable) {
-        return repository.findByCentroCodigo(codigoCentro, nombre, pageable);
+    public Page<Estacion> listarPorCentro(
+            String codigoCentro,
+            String codigoEstacion,
+            String nombre,
+            Double minX,
+            Double maxX,
+            Double minY,
+            Double maxY,
+            Pageable pageable
+    ) {
+        return repository.findByCentroCodigo(codigoCentro, codigoEstacion, nombre, minX, maxX, minY, maxY, pageable);
     }
 }

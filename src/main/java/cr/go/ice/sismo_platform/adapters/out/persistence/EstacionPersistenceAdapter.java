@@ -18,11 +18,17 @@ public class EstacionPersistenceAdapter implements EstacionRepositoryPort {
     }
 
     @Override
-    public Page<Estacion> findByCentroCodigo(String codigoCentro, String nombre, Pageable pageable) {
-        if (nombre == null || nombre.isBlank()) {
-            return repository.findByCodCentroPrd(codigoCentro, pageable).map(EstacionMapper::toDomain);
-        }
-        return repository.findByCodCentroPrdAndNomEstacionContainingIgnoreCase(codigoCentro, nombre, pageable)
+    public Page<Estacion> findByCentroCodigo(
+            String codigoCentro,
+            String codigoEstacion,
+            String nombre,
+            Double minX,
+            Double maxX,
+            Double minY,
+            Double maxY,
+            Pageable pageable
+    ) {
+        return repository.search(codigoCentro, codigoEstacion, nombre, minX, maxX, minY, maxY, pageable)
                 .map(EstacionMapper::toDomain);
     }
 }
