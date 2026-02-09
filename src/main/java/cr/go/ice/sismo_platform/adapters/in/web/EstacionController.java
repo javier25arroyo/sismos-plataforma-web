@@ -15,9 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ * Controlador REST para gestionar operaciones relacionadas con las Estaciones.
+ * Proporciona endpoints para listar estaciones filtradas por centro de producción.
+ */
 @RestController
 @RequestMapping("/api/centros/{codigoCentro}/estaciones")
-@Tag(name = "Estaciones")
+@Tag(name = "Estaciones", description = "Endpoints para la gestión de estaciones sismológicas")
 public class EstacionController {
 
     private final BuscarEstacionesPorCentroUseCase buscarEstacionesUseCase;
@@ -26,8 +30,23 @@ public class EstacionController {
         this.buscarEstacionesUseCase = buscarEstacionesUseCase;
     }
 
+    /**
+     * Lista las estaciones asociadas a un centro de producción específico.
+     * Permite filtrado por código, nombre y coordenadas geográficas.
+     *
+     * @param codigoCentro   Código del centro de producción.
+     * @param codigoEstacion Filtro opcional por código de estación.
+     * @param nombre         Filtro opcional por nombre de estación.
+     * @param minX           Coordenada X mínima.
+     * @param maxX           Coordenada X máxima.
+     * @param minY           Coordenada Y mínima.
+     * @param maxY           Coordenada Y máxima.
+     * @param pageable       Información de paginación.
+     * @return Página de estaciones que cumplen con los criterios.
+     */
     @GetMapping
-    @Operation(summary = "Lista estaciones por centro con paginación y filtros")
+    @Operation(summary = "Lista estaciones por centro con paginación y filtros", 
+               description = "Retorna una página de estaciones pertenecientes al centro de producción especificado.")
     public Page<EstacionResponse> listar(
             @PathVariable String codigoCentro,
             @Parameter(description = "Filtra por código de estación exacto") @RequestParam(required = false) String codigoEstacion,

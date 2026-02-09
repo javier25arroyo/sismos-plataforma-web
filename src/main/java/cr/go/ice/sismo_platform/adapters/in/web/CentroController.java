@@ -14,9 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
 
+/**
+ * Controlador REST para gestionar los Centros de Producción.
+ * Proporciona endpoints para la búsqueda y listado de centros con soporte para paginación y filtrado.
+ */
 @RestController
 @RequestMapping("/api/centros")
-@Tag(name = "Centros de Producción")
+@Tag(name = "Centros de Producción", description = "Endpoints para la gestión de centros de producción")
 public class CentroController {
 
     private final BuscarCentrosProduccionUseCase buscarCentrosUseCase;
@@ -25,11 +29,27 @@ public class CentroController {
         this.buscarCentrosUseCase = buscarCentrosUseCase;
     }
 
+    /**
+     * Lista los centros de producción aplicando filtros opcionales y paginación.
+     *
+     * @param codigo   Prefijo opcional del código del centro para filtrar.
+     * @param nombre   Nombre o parte del nombre del centro para filtrar (búsqueda parcial).
+     * @param pageable Configuración de paginación (page, size, sort).
+     * @return Una página de objetos {@link CentroProduccionResponse}.
+     */
     @GetMapping
-    @Operation(summary = "Lista centros de producción con paginación y filtros")
+    @Operation(
+        summary = "Lista centros de producción",
+        description = "Retorna una lista paginada de centros de producción. Permite filtrar por prefijo de código y por nombre."
+    )
     public Page<CentroProduccionResponse> listar(
-            @Parameter(description = "Filtra por prefijo del código del centro") @RequestParam(required = false) String codigo,
-            @Parameter(description = "Filtra por nombre del centro (contiene)") @RequestParam(required = false) String nombre,
+            @Parameter(description = "Filtra por prefijo del código del centro (ej. 'CH')") 
+            @RequestParam(required = false) String codigo,
+            
+            @Parameter(description = "Filtra por nombre del centro (búsqueda parcial, insensible a mayúsculas/minúsculas)") 
+            @RequestParam(required = false) String nombre,
+            
+            @Parameter(description = "Parámetros de paginación y ordenamiento") 
             Pageable pageable
     ) {
         var filtros = new BuscarCentrosFiltros(codigo, nombre, pageable);
