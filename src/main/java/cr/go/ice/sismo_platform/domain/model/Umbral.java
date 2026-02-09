@@ -1,9 +1,9 @@
 package cr.go.ice.sismo_platform.domain.model;
 
 public record Umbral(
-        String codParametro,
+        Integer codParametro,
         String codUmbral,
-        Double valor,
+        Double limiteInferior,
         String mensaje,
         String color
 ) {}

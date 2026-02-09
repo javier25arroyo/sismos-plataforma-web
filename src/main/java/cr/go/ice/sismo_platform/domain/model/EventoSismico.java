@@ -2,7 +2,7 @@ package cr.go.ice.sismo_platform.domain.model;
 
 import java.time.LocalDateTime;
 
-public record Sismo(
+public record EventoSismico(
         LocalDateTime feSismo,
         Double magnitud,
         Double profundidad,
@@ -15,3 +15,4 @@ public record Sismo(
         String origen,
         Character sentido
 ) {}
+

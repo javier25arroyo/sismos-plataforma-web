@@ -9,7 +9,7 @@ public final class UmbralMapper {
 
     public static Umbral toDomain(UmbralEntity entity) {
         return new Umbral(
-                entity.getCodParametro(),
+                Integer.parseInt(entity.getCodParametro()),
                 entity.getCodUmbral(),
                 entity.getValor(),
                 entity.getMensaje(),

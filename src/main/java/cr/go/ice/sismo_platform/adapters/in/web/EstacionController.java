@@ -1,7 +1,8 @@
 package cr.go.ice.sismo_platform.adapters.in.web;
 
 import cr.go.ice.sismo_platform.adapters.in.web.dto.EstacionResponse;
-import cr.go.ice.sismo_platform.application.port.in.EstacionQuery;
+import cr.go.ice.sismo_platform.application.usecase.BuscarEstacionesPorCentroUseCase;
+import cr.go.ice.sismo_platform.application.usecase.BuscarEstacionesPorCentroUseCase.BuscarEstacionesFiltros;
 import cr.go.ice.sismo_platform.domain.model.Estacion;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,10 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "Estaciones")
 public class EstacionController {
 
-    private final EstacionQuery query;
+    private final BuscarEstacionesPorCentroUseCase buscarEstacionesUseCase;
 
-    public EstacionController(EstacionQuery query) {
-        this.query = query;
+    public EstacionController(BuscarEstacionesPorCentroUseCase buscarEstacionesUseCase) {
+        this.buscarEstacionesUseCase = buscarEstacionesUseCase;
     }
 
     @GetMapping
@@ -37,15 +38,16 @@ public class EstacionController {
             @Parameter(description = "Coordenada Y máxima") @RequestParam(required = false) Double maxY,
             Pageable pageable
     ) {
-        return query.listarPorCentro(codigoCentro, codigoEstacion, nombre, minX, maxX, minY, maxY, pageable)
-                .map(EstacionController::toResponse);
+        var filtros = new BuscarEstacionesFiltros(
+            codigoCentro, codigoEstacion, nombre, minX, maxX, minY, maxY, pageable);
+        return buscarEstacionesUseCase.ejecutar(filtros).map(EstacionController::toResponse);
     }
 
     private static EstacionResponse toResponse(Estacion estacion) {
         return new EstacionResponse(
-                estacion.codigoCentro(),
-                estacion.codigoEstacion(),
-                estacion.nombre(),
+                estacion.codCentroPrd(),
+                estacion.codEstacion(),
+                estacion.nomEstacion(),
                 estacion.coordenadaX(),
                 estacion.coordenadaY()
         );

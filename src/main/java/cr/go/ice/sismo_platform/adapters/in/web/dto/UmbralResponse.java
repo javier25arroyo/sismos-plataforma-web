@@ -1,9 +1,11 @@
 package cr.go.ice.sismo_platform.adapters.in.web.dto;
 
 public record UmbralResponse(
-        String codParametro,
+        Integer codParametro,
         String codUmbral,
-        Double valor,
+        Double limiteInferior,
         String mensaje,
         String color
-) {}
+) {
+
+}

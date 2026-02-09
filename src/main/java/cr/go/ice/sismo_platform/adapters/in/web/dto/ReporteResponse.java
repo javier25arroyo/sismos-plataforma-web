@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record ReporteResponse(
         LocalDateTime feReporte,
-        String titulo,
+        String tituloReporte,
         String resumen,
         String url,
         String autor

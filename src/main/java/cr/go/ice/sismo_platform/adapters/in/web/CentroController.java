@@ -1,7 +1,8 @@
 package cr.go.ice.sismo_platform.adapters.in.web;
 
 import cr.go.ice.sismo_platform.adapters.in.web.dto.CentroProduccionResponse;
-import cr.go.ice.sismo_platform.application.port.in.CentroProduccionQuery;
+import cr.go.ice.sismo_platform.application.usecase.BuscarCentrosProduccionUseCase;
+import cr.go.ice.sismo_platform.application.usecase.BuscarCentrosProduccionUseCase.BuscarCentrosFiltros;
 import cr.go.ice.sismo_platform.domain.model.CentroProduccion;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Tag(name = "Centros de Producción")
 public class CentroController {
 
-    private final CentroProduccionQuery query;
+    private final BuscarCentrosProduccionUseCase buscarCentrosUseCase;
 
-    public CentroController(CentroProduccionQuery query) {
-        this.query = query;
+    public CentroController(BuscarCentrosProduccionUseCase buscarCentrosUseCase) {
+        this.buscarCentrosUseCase = buscarCentrosUseCase;
     }
 
     @GetMapping
@@ -31,10 +32,11 @@ public class CentroController {
             @Parameter(description = "Filtra por nombre del centro (contiene)") @RequestParam(required = false) String nombre,
             Pageable pageable
     ) {
-        return query.listarCentros(codigo, nombre, pageable).map(CentroController::toResponse);
+        var filtros = new BuscarCentrosFiltros(codigo, nombre, pageable);
+        return buscarCentrosUseCase.ejecutar(filtros).map(CentroController::toResponse);
     }
 
     private static CentroProduccionResponse toResponse(CentroProduccion centro) {
-        return new CentroProduccionResponse(centro.codigo(), centro.nombre());
+        return new CentroProduccionResponse(centro.codCentroPrd(), centro.nomCentroPrd());
     }
 }

@@ -5,5 +5,5 @@ import cr.go.ice.sismo_platform.domain.model.Umbral;
 import java.util.List;
 
 public interface UmbralQuery {
-    List<Umbral> listarPorParametro(String codParametro);
+    List<Umbral> listarPorParametro(Integer codParametro);
 }

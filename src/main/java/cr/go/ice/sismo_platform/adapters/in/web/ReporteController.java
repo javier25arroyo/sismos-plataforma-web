@@ -42,7 +42,7 @@ public class ReporteController {
     private static ReporteResponse toResponse(ReporteRepositorio reporte) {
         return new ReporteResponse(
                 reporte.feReporte(),
-                reporte.titulo(),
+                reporte.tituloReporte(),
                 reporte.resumen(),
                 reporte.url(),
                 reporte.autor()

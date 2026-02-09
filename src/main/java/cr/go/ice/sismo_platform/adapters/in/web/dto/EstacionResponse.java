@@ -1,9 +1,9 @@
 package cr.go.ice.sismo_platform.adapters.in.web.dto;
 
 public record EstacionResponse(
-        String codigoCentro,
-        String codigoEstacion,
-        String nombre,
+        String codCentroPrd,
+        String codEstacion,
+        String nomEstacion,
         Double coordenadaX,
         Double coordenadaY
 ) {}
