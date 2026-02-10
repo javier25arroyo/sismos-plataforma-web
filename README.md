@@ -10,7 +10,6 @@ Proyecto backend en Java usando Spring Boot destinado a la plataforma "sismo-pla
 Documentación adicional incluida:
 - CLEAN_HEXAGONAL_ARCHITECTURE.md — explicación de la arquitectura y convenciones del proyecto.
 - MODELO_DOMINIO_SOLID.md — notas sobre el diseño del dominio aplicando principios SOLID.
-- HELP.md — ayudas y atajos específicos del repositorio.
 
 ## Tecnologías
 
