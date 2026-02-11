@@ -1,0 +1,16 @@
+.gradle
+build
+bin
+out
+.idea
+.vscode
+.git
+*.log
+.gitignore
+.gitattributes
+README.md
+CLEAN_HEXAGONAL_ARCHITECTURE.md
+MODELO_DOMINIO_SOLID.md
+docker-compose.yml
+Dockerfile
+.dockerignore

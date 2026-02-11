@@ -1,0 +1,36 @@
+services:
+  app:
+    build: .
+    container_name: sismo-platform-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://db:1433;databaseName=${DB_NAME:-master};encrypt=true;trustServerCertificate=${DB_TRUST_CERT:-true}
+      - SPRING_DATASOURCE_USERNAME=${DB_USER:-sa}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update # Automatically create/update schema in dev
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sismo-platform-db
+    ports:
+      - "127.0.0.1:51433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=Developer
+    healthcheck:
+      test: ["CMD-SHELL", "/usr/bin/timeout 1 bash -c '</dev/tcp/localhost/1433'"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 20s
+    volumes:
+      - mssql_data:/var/opt/mssql
+
+volumes:
+  mssql_data:
