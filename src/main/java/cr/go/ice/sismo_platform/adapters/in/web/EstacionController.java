@@ -6,9 +6,14 @@ import cr.go.ice.sismo_platform.application.usecase.BuscarEstacionesPorCentroUse
 import cr.go.ice.sismo_platform.domain.model.Estacion;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,8 +52,59 @@ public class EstacionController {
     @GetMapping
     @Operation(summary = "Lista estaciones por centro con paginación y filtros", 
                description = "Retorna una página de estaciones pertenecientes al centro de producción especificado.")
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Listado paginado de estaciones",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                                    name = "EstacionesPaginadas",
+                                    summary = "Respuesta paginada",
+                                    value = """
+                                            {
+                                              "content": [
+                                                {
+                                                  "codCentroPrd": "CB",
+                                                  "codEstacion": "BA",
+                                                  "nomEstacion": "Base",
+                                                  "coordenadaX": -84.178,
+                                                  "coordenadaY": 10.309
+                                                }
+                                              ],
+                                              "pageable": { "pageNumber": 0, "pageSize": 10 },
+                                              "totalElements": 1,
+                                              "totalPages": 1,
+                                              "last": true,
+                                              "size": 10,
+                                              "number": 0,
+                                              "sort": { "sorted": false, "unsorted": true, "empty": true },
+                                              "first": true,
+                                              "numberOfElements": 1,
+                                              "empty": false
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Parámetros de filtro o paginación inválidos",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Centro de producción no encontrado",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
     public Page<EstacionResponse> listar(
-            @PathVariable String codigoCentro,
+            @Parameter(description = "Código del centro de producción") @PathVariable String codigoCentro,
             @Parameter(description = "Filtra por código de estación exacto") @RequestParam(required = false) String codigoEstacion,
             @Parameter(description = "Filtra por nombre (contiene)") @RequestParam(required = false) String nombre,
             @Parameter(description = "Coordenada X mínima") @RequestParam(required = false) Double minX,

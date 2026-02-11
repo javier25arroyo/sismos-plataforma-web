@@ -9,9 +9,9 @@ public final class UmbralMapper {
 
     public static Umbral toDomain(UmbralEntity entity) {
         return new Umbral(
-                Integer.parseInt(entity.getCodParametro()),
+                entity.getCodParametro(),
                 entity.getCodUmbral(),
-                entity.getValor(),
+                entity.getLimiteInferior(),
                 entity.getMensaje(),
                 entity.getColor()
         );

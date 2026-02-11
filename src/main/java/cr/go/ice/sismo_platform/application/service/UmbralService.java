@@ -18,6 +18,6 @@ public class UmbralService implements UmbralQuery {
 
     @Override
     public List<Umbral> listarPorParametro(Integer codParametro) {
-        return repository.findByParametro(codParametro.toString());
+        return repository.findByParametro(codParametro);
     }
 }

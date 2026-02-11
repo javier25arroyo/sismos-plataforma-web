@@ -18,7 +18,7 @@ public class UmbralPersistenceAdapter implements UmbralRepositoryPort {
     }
 
     @Override
-    public List<Umbral> findByParametro(String codParametro) {
+    public List<Umbral> findByParametro(Integer codParametro) {
         return repository.findByCodParametro(codParametro).stream().map(UmbralMapper::toDomain).toList();
     }
 }

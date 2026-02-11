@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface UmbralJpaRepository extends JpaRepository<UmbralEntity, UmbralId> {
-    List<UmbralEntity> findByCodParametro(String codParametro);
+    List<UmbralEntity> findByCodParametro(Integer codParametro);
 }
