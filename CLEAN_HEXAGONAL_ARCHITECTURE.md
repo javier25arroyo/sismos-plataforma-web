@@ -1,33 +1,35 @@
-# Arquitectura Clean y Hexagonal - Plataforma de Monitoreo Sísmico
+# Arquitectura y Modelo de Dominio - Plataforma de Monitoreo Sísmico
 
 ## 🏗️ Arquitectura Implementada
 
-Este proyecto implementa **Clean Architecture** y **Arquitectura Hexagonal (Ports & Adapters)** siguiendo los principios de Uncle Bob Martin y Alistair Cockburn.
+Este proyecto implementa **Clean Architecture** y **Arquitectura Hexagonal (Ports & Adapters)** siguiendo los principios de SOLID para garantizar un sistema mantenible, testeable y escalable.
 
 ### 📋 Estructura de Capas
 
 ```
 src/main/java/cr/go/ice/sismo_platform/
 ├── domain/                          # 🟢 DOMINIO (Capa más interna)
-│   ├── model/                      # Entidades de negocio
+│   ├── model/                      # Entidades de negocio (Lombok @Data)
+│   ├── valueobject/                # Objetos de valor
 │   └── exception/                  # Excepciones del dominio
-├── application/                     # 🔵 APLICACIÓN (Casos de Uso)
-│   ├── usecase/                    # Interfaces de casos de uso
-│   │   └── impl/                   # Implementaciones de casos de uso
+├── application/                     # 🔵 APLICACIÓN (Lógica de Negocio)
+│   ├── usecase/                    # Definición e implementación de Casos de Uso
+│   │   └── impl/                   
+│   ├── service/                    # Servicios de aplicación
 │   └── port/                       # Puertos (Interfaces)
-│       ├── in/                     # Puertos de entrada
-│       └── out/                    # Puertos de salida
-├── adapters/                       # 🟡 ADAPTADORES (Capa externa)
-│   ├── in/                         # Adaptadores de entrada
-│   │   └── web/                    # Controladores REST
+│       ├── in/                     # Puertos de entrada (Queries/Commands)
+│       └── out/                    # Puertos de salida (Repositorios/External)
+├── adapters/                       # 🟡 ADAPTADORES (Infraestructura)
+│   ├── in/                         # Adaptadores de entrada (Web/REST)
+│   │   └── web/                    
 │   │       ├── dto/                # DTOs de transferencia
 │   │       └── exception/          # Manejo de excepciones web
-│   └── out/                        # Adaptadores de salida
-│       └── persistence/            # Persistencia de datos
+│   └── out/                        # Adaptadores de salida (Persistencia)
+│       └── persistence/            
 │           ├── entity/             # Entidades JPA
-│           ├── mapper/             # Mappers dominio ↔ persistencia
+│           ├── mapper/             # Mappers Dominio ↔ Persistencia
 │           └── repository/         # Repositorios JPA
-└── config/                         # ⚙️ CONFIGURACIÓN
+└── config/                         # ⚙️ CONFIGURACIÓN (Framework)
     ├── SecurityConfig.java
     ├── WebConfig.java
     ├── PersistenceConfig.java
@@ -36,275 +38,84 @@ src/main/java/cr/go/ice/sismo_platform/
 
 ---
 
-## 🎯 Principios Clean Architecture Implementados
+## 🎯 Principios SOLID Aplicados
 
-### 1. **Dependency Rule (Regla de Dependencias)**
-✅ **Las dependencias apuntan hacia adentro**
-```
-Adaptadores → Aplicación → Dominio
-    ↑             ↑          ↑
- External    Use Cases   Entities
-```
+### **S - Single Responsibility (Responsabilidad Única)**
+✅ Cada componente tiene una responsabilidad clara y única:
+- **Models**: Representan el estado y reglas del negocio.
+- **Use Cases**: Orquestan la lógica de un proceso de negocio específico.
+- **Controllers**: Solo manejan la comunicación HTTP y delegan a la aplicación.
+- **Mappers**: Transforman datos entre capas sin mezclar lógica.
 
-### 2. **Independencia de Frameworks**
-✅ **El dominio no conoce Spring, JPA o web frameworks**
-- Entidades puras usando Java Records
-- Sin anotaciones de framework en el dominio
-- Lógica de negocio independiente
+### **O - Open/Closed (Abierto/Cerrado)**
+✅ El sistema permite extensión sin modificar código existente:
+- Nuevos casos de uso se agregan como nuevas clases.
+- Se pueden añadir nuevos adaptadores (ej. una nueva base de datos o API) implementando los puertos existentes.
 
-### 3. **Independencia de UI**
-✅ **La lógica no depende de REST/Web**
-- Casos de uso con interfaces puras
-- DTOs separados del dominio
-- Controladores como adaptadores
+### **L - Liskov Substitution (Sustitución de Liskov)**
+✅ Las implementaciones son intercambiables:
+- Los adaptadores de persistencia implementan interfaces de puerto, permitiendo cambiar la implementación sin afectar la lógica de aplicación.
 
-### 4. **Independencia de Base de Datos**
-✅ **El dominio no conoce sobre persistencia**
-- Puertos definen contratos
-- Mappers traducen entre capas
-- Repositorios implementan puertos
+### **I - Interface Segregation (Segregación de Interfaces)**
+✅ Interfaces específicas y granulares:
+- Los puertos están divididos por funcionalidad (`UmbralQuery`, `CentroProduccionRepositoryPort`), evitando que las clases dependan de métodos que no usan.
 
-### 5. **Testabilidad**
-✅ **Fácil testing por capas**
-- Casos de uso testeable sin BD
-- Mocks de puertos
-- Validaciones en dominio
+### **D - Dependency Inversion (Inversión de Dependencias)**
+✅ Las dependencias apuntan hacia las abstracciones:
+- La capa de aplicación no depende de la persistencia o la web; ambas dependen de las interfaces (puertos) definidas en la capa de aplicación/dominio.
+- `Adaptadores → Puertos ← Aplicación → Dominio`
 
 ---
 
 ## 🔌 Arquitectura Hexagonal (Ports & Adapters)
 
 ### **Puertos de Entrada (In Ports)**
+Definen qué puede hacer el sistema. Los controladores web llaman a estas interfaces.
 ```java
-// Casos de uso como puertos de entrada
-public interface BuscarCentrosProduccionUseCase {
-    Page<CentroProduccion> ejecutar(BuscarCentrosFiltros filtros);
-}
-```
-
-### **Adaptadores de Entrada (In Adapters)**
-```java
-// Controladores REST como adaptadores
-@RestController
-public class CentroController {
-    private final BuscarCentrosProduccionUseCase useCase;
-    // Adapta HTTP → Caso de Uso
+public interface CentroProduccionQuery {
+    Page<CentroProduccion> listarCentros(String codigo, String nombre, Pageable pageable);
 }
 ```
 
 ### **Puertos de Salida (Out Ports)**
+Definen qué necesita el sistema de agentes externos (BD, APIs).
 ```java
-// Interfaces para servicios externos
 public interface CentroProduccionRepositoryPort {
-    Page<CentroProduccion> findAll(...);
+    Page<CentroProduccion> findAll(String codigo, String nombre, Pageable pageable);
 }
 ```
 
-### **Adaptadores de Salida (Out Adapters)**
-```java
-// Implementaciones de persistencia
-@Component
-public class CentroProduccionPersistenceAdapter 
-    implements CentroProduccionRepositoryPort {
-    // Adapta BD → Puerto
-}
-```
+### **Adaptadores (Adapters)**
+Implementan la comunicación con el mundo exterior (Spring MVC para Web, Spring Data JPA para Persistencia).
 
 ---
 
-## 🛡️ Características de Seguridad
+## 💎 Modelo de Dominio
 
-### **Manejo de Excepciones**
-```java
-@ControllerAdvice
-public class GlobalExceptionHandler {
-    // Convierte excepciones de dominio a HTTP
-    @ExceptionHandler(ResourceNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ProblemDetail handleResourceNotFound(...);
-}
-```
+Las entidades de dominio son el núcleo del sistema. Se utilizan anotaciones de **Lombok** (`@Data`, `@Builder`, `@Accessors(fluent = true)`) para mantener el código limpio y facilitar la inmutabilidad y legibilidad.
 
-### **Validaciones de Dominio**
-```java
-public class InvalidDomainDataException extends DomainException {
-    // Excepciones específicas del dominio
-}
-```
-
----
-
-## 📊 Casos de Uso Implementados
-
-### 1. **Buscar Centros de Producción**
-```java
-public class BuscarCentrosProduccionUseCaseImpl {
-    // Lógica: validación + consulta + mapeado
-    public Page<CentroProduccion> ejecutar(BuscarCentrosFiltros filtros);
-}
-```
-
-### 2. **Buscar Estaciones por Centro**
-```java
-public class BuscarEstacionesPorCentroUseCaseImpl {
-    // Lógica: validación geográfica + filtros + consulta
-    public Page<Estacion> ejecutar(BuscarEstacionesFiltros filtros);
-}
-```
-
-### 3. **Obtener Umbrales por Parámetro**
-```java
-public class ObtenerUmbralesPorParametroUseCaseImpl {
-    // Lógica: validación de parámetros + consulta
-    public List<Umbral> ejecutar(ObtenerUmbralesComando comando);
-}
-```
+### Entidades Principales
+1.  **Sismo**: Representa un evento sísmico con magnitud, profundidad y ubicación.
+2.  **Estacion**: Datos técnicos y ubicación de las estaciones de monitoreo.
+3.  **CentroProduccion**: Centros que agrupan estaciones.
+4.  **Umbral**: Límites configurables para alertas sísmicas.
+5.  **DatoIntensidadSismica**: Lecturas en tiempo real de aceleración y desplazamiento.
+6.  **Usuario**: Gestión de personal y notificaciones.
 
 ---
 
 ## 🔄 Flujo de Datos
 
-```
-HTTP Request
-      ↓
-[Controller] → Valida entrada, crea comando
-      ↓
-[Use Case]   → Ejecuta lógica de negocio
-      ↓
-[Repository] → Accede a datos (vía puerto)
-      ↓
-[Mapper]     → Convierte Entity → Domain
-      ↓
-[Use Case]   → Procesa y retorna
-      ↓
-[Controller] → Convierte a DTO y responde
-      ↓
-HTTP Response
-```
+1.  **Request**: El cliente envía una petición HTTP.
+2.  **Adaptador In**: El `Controller` recibe el DTO, lo valida y llama a un `UseCase` o `Service` a través de un puerto.
+3.  **Aplicación**: El `Service` ejecuta la lógica, interactuando con el `Dominio` y llamando a puertos de salida si requiere datos.
+4.  **Adaptador Out**: El `PersistenceAdapter` implementa el puerto de salida, usa mappers para convertir entidades JPA a modelos de dominio y viceversa.
+5.  **Response**: El resultado viaja de vuelta, el `Controller` lo convierte a un `ResponseDTO` y lo envía al cliente.
 
 ---
 
-## ⚡ Beneficios Obtenidos
+## ✅ Beneficios de esta Arquitectura
 
-### **1. Mantenibilidad**
-- Código organizado por responsabilidades
-- Cambios localizados a una capa
-- Refactoring seguro
-
-### **2. Testabilidad**
-- Testing independiente por capa
-- Mocking fácil de dependencias
-- Tests unitarios rápidos
-
-### **3. Flexibilidad**
-- Fácil cambio de tecnologías
-- Adaptadores intercambiables
-- Evolución incremental
-
-### **4. Escalabilidad**
-- Separación clara de responsabilidades
-- Casos de uso reutilizables
-- Paralelización de desarrollo
-
----
-
-## 🎯 Principios SOLID Aplicados
-
-### **S - Single Responsibility**
-✅ Cada clase tiene una única responsabilidad
-- Use Cases: Un caso de uso específico
-- Controllers: Un recurso REST
-- Mappers: Una conversión específica
-
-### **O - Open/Closed**
-✅ Abierto para extensión, cerrado para modificación
-- Nuevos casos de uso sin modificar existentes
-- Nuevos adaptadores sin cambiar puertos
-- Polimorfismo via interfaces
-
-### **L - Liskov Substitution**
-✅ Implementaciones intercambiables
-- Cualquier implementación de puerto es válida
-- Testing con mocks
-- Múltiples adaptadores
-
-### **I - Interface Segregation**
-✅ Interfaces específicas y pequeñas
-- Puertos focalizados
-- Casos de uso granulares
-- Sin dependencias innecesarias
-
-### **D - Dependency Inversion**
-✅ Dependencias hacia abstracciones
-- Use Cases dependen de puertos
-- Implementaciones dependen de interfaces
-- Inversión de control con Spring
-
----
-
-## 📈 Métricas de Calidad
-
-### **Acoplamiento**
-- ✅ **Bajo**: Capas comunicándose via interfaces
-- ✅ **Direccional**: Dependencias hacia adentro
-
-### **Cohesión**
-- ✅ **Alta**: Cada módulo con responsabilidad clara
-- ✅ **Funcional**: Casos de uso cohesivos
-
-### **Complejidad**
-- ✅ **Reducida**: Lógica separada por capas
-- ✅ **Localizada**: Cambios en una sola capa
-
----
-
-## 🚀 Próximos Pasos Sugeridos
-
-### **1. Testing**
-```bash
-# Agregar tests unitarios por capa
-src/test/java/
-├── domain/          # Tests de entidades y validaciones
-├── application/     # Tests de casos de uso
-└── adapters/        # Tests de integración
-```
-
-### **2. Observabilidad**
-```java
-// Métricas, logging, tracing
-@Component
-public class MetricsUseCase {
-    // Decorador para casos de uso
-}
-```
-
-### **3. Eventos de Dominio**
-```java
-// Comunicación asíncrona
-public class SismoDetectadoEvent {
-    // Event-driven architecture
-}
-```
-
-### **4. CQRS**
-```java
-// Separación Command/Query
-public interface CommandHandler<T> {}
-public interface QueryHandler<T,R> {}
-```
-
----
-
-## ✅ Resumen Final
-
-El proyecto **Plataforma de Monitoreo Sísmico** ahora implementa correctamente:
-
-🏗️ **Clean Architecture** - Capas bien definidas y regla de dependencias  
-🔌 **Hexagonal Architecture** - Puertos y adaptadores implementados  
-🛡️ **SOLID Principles** - Los 5 principios aplicados consistentemente  
-⚙️ **Separation of Concerns** - Cada capa con responsabilidad específica  
-🧪 **High Testability** - Arquitectura preparada para testing  
-🔄 **Loose Coupling** - Componentes débilmente acoplados  
-📊 **Business Logic Protection** - Dominio protegido de detalles técnicos  
-
-**¡La arquitectura está lista para soportar el crecimiento y evolución del sistema!**
+-   **Testabilidad**: Se pueden probar los casos de uso mediante Mocks de los puertos de salida, sin necesidad de base de datos.
+-   **Independencia Tecnológica**: El negocio está protegido de cambios en el framework, base de datos o librerías externas.
+-   **Mantenibilidad**: La separación clara de responsabilidades reduce el impacto de los cambios y facilita el entendimiento del sistema.
