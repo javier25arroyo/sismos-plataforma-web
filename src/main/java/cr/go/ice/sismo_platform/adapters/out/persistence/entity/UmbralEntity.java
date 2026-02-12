@@ -4,7 +4,11 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,19 +24,26 @@ import lombok.Setter;
 public class UmbralEntity {
 
     @Id
-    @Column(name = "Cod_Parametro", length = 3, nullable = false)
-    private String codParametro;
+    @Column(name = "Cod_Parametro", nullable = false)
+    private Integer codParametro;
 
     @Id
     @Column(name = "Cod_umbral", length = 10, nullable = false)
     private String codUmbral;
 
-    @Column(name = "valor", nullable = false)
-    private Double valor;
+    @Column(name = "limite_inferior")
+    private Double limiteInferior;
 
-    @Column(name = "Mensaje", length = 255)
+    @Column(name = "mensaje", length = 255)
     private String mensaje;
 
-    @Column(name = "Color", length = 10)
+    @Column(name = "color", length = 10)
     private String color;
+
+    @ManyToOne
+    @JoinColumn(name = "Cod_Parametro", referencedColumnName = "Cod_Parametro", insertable = false, updatable = false)
+    private ParametroIntensidadSismicaEntity parametro;
+
+    @OneToMany(mappedBy = "umbral")
+    private List<AlarmaPorEstacionEntity> alarmas;
 }

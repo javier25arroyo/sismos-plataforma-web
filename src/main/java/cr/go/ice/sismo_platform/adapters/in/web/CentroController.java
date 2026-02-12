@@ -6,9 +6,14 @@ import cr.go.ice.sismo_platform.application.usecase.BuscarCentrosProduccionUseCa
 import cr.go.ice.sismo_platform.domain.model.CentroProduccion;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +47,46 @@ public class CentroController {
         summary = "Lista centros de producción",
         description = "Retorna una lista paginada de centros de producción. Permite filtrar por prefijo de código y por nombre."
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Listado paginado de centros de producción",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                                    name = "CentrosPaginados",
+                                    summary = "Respuesta paginada",
+                                    value = """
+                                            {
+                                              "content": [
+                                                { "codCentroPrd": "CB", "nomCentroPrd": "C.P. CARIBLANCO" }
+                                              ],
+                                              "pageable": { "pageNumber": 0, "pageSize": 10 },
+                                              "totalElements": 1,
+                                              "totalPages": 1,
+                                              "last": true,
+                                              "size": 10,
+                                              "number": 0,
+                                              "sort": { "sorted": false, "unsorted": true, "empty": true },
+                                              "first": true,
+                                              "numberOfElements": 1,
+                                              "empty": false
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Parámetros de filtro o paginación inválidos",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))
+            )
+    })
     public Page<CentroProduccionResponse> listar(
             @Parameter(description = "Filtra por prefijo del código del centro (ej. 'CH')") 
             @RequestParam(required = false) String codigo,

@@ -11,9 +11,9 @@ public final class CentroProduccionMapper {
         return new CentroProduccion(
                 entity.getCodCentroPrd(),
                 entity.getNomCentroPrd(),
-                null, // coordenadaX no disponible en entity
-                null, // coordenadaY no disponible en entity
-                null  // grupoDespliegue no disponible en entity
+                entity.getCoordenadaX(),
+                entity.getCoordenadaY(),
+                entity.getIdRegion()
         );
     }
 }

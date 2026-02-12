@@ -23,7 +23,7 @@ public class ObtenerUmbralesPorParametroUseCaseImpl implements ObtenerUmbralesPo
     public List<Umbral> ejecutar(ObtenerUmbralesComando comando) {
         validarComando(comando);
 
-        return repositoryPort.findByParametro(comando.codigoParametro().toString());
+        return repositoryPort.findByParametro(comando.codigoParametro());
     }
 
     private void validarComando(ObtenerUmbralesComando comando) {

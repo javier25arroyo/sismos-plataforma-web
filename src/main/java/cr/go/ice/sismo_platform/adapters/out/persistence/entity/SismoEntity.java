@@ -1,34 +1,27 @@
 package cr.go.ice.sismo_platform.adapters.out.persistence.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.Lob;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Sismos", schema = "dbo")
-@IdClass(SismoId.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class SismoEntity {
 
-    @Id
-    @Column(name = "Fe_Sismo", nullable = false)
-    private LocalDateTime feSismo;
-
-    @Id
-    @Column(name = "Magnitud", nullable = false)
-    private Double magnitud;
+    @EmbeddedId
+    private SismoId id;
 
     @Column(name = "Profundidad", nullable = false)
     private Double profundidad;
@@ -46,6 +39,9 @@ public class SismoEntity {
     private String urlFuente;
 
     @Lob
-    @Column(name = "Mapa")
+    @Column(name = "mapa")
     private byte[] mapa;
+
+    @OneToOne(mappedBy = "sismo")
+    private SismoMapaEntity sismoMapa;
 }
