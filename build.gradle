@@ -46,9 +46,24 @@ dependencies {
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+	useJUnitPlatform {
+		excludeTags 'performance'
+	}
 	jvmArgs '-Xshare:off'
 	jvmArgs "-javaagent:${configurations.mockitoAgent.singleFile}"
 	// Exclude integration tests and context-loading tests that require external services in CI/local without DB/Docker
 	exclude '**/*IntegrationTest*', '**/SismoPlatformApplicationTests*'
+}
+
+tasks.register('performanceTest', Test) {
+	description = 'Runs performance-focused tests'
+	group = 'verification'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'performance'
+	}
+	jvmArgs '-Xshare:off'
+	jvmArgs "-javaagent:${configurations.mockitoAgent.singleFile}"
+	shouldRunAfter tasks.named('test')
 }
