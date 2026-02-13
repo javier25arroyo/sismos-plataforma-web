@@ -47,3 +47,4 @@ config/application-secrets.yaml
 *.jks
 *.p12
 
+/documentos
