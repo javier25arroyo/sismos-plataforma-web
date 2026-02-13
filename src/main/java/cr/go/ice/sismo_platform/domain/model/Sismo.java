@@ -21,7 +21,7 @@ public class Sismo {
     Double coordenadaY;
     String urlFuente;
     byte[] mapa;
-    String intensidades;
+    IntensidadSismica intensidades;
     String origen;
-    Character sentido;
+    SentidoSismo sentido;
 }

@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class Umbral {
     Integer codParametro;
-    String codUmbral;
+    NivelUmbral codUmbral;
     Double limiteInferior;
     String mensaje;
     String color;

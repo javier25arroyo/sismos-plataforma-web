@@ -91,7 +91,7 @@ public class UmbralController {
     private static UmbralResponse toResponse(Umbral umbral) {
         return new UmbralResponse(
                 umbral.codParametro(),
-                umbral.codUmbral(),
+                umbral.codUmbral().databaseValue(),
                 umbral.limiteInferior(),
                 umbral.mensaje(),
                 umbral.color()

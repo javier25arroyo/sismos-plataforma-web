@@ -1,5 +1,6 @@
 package cr.go.ice.sismo_platform.adapters.out.persistence.entity;
 
+import cr.go.ice.sismo_platform.domain.model.NivelUmbral;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,5 +16,5 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class UmbralId implements Serializable {
     private Integer codParametro;
-    private String codUmbral;
+    private NivelUmbral codUmbral;
 }

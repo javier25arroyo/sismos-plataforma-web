@@ -21,7 +21,7 @@ public class EventoSismico {
     Double coordenadaY;
     String urlFuente;
     byte[] mapa;
-    String intensidades;
+    IntensidadSismica intensidades;
     String origen;
-    Character sentido;
+    SentidoSismo sentido;
 }

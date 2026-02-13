@@ -9,7 +9,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record UmbralResponse(
         @Schema(description = "Código del parámetro", example = "101")
         Integer codParametro,
-        @Schema(description = "Código del umbral", example = "NIVEL 1")
+        @Schema(
+                description = "Código del umbral de alerta (jerarquía: NIVEL 0 < NIVEL 1 < NIVEL 2 < NIVEL 3)",
+                example = "NIVEL 1",
+                allowableValues = {"NIVEL 0", "NIVEL 1", "NIVEL 2", "NIVEL 3"}
+        )
         String codUmbral,
         @Schema(description = "Límite inferior del umbral", example = "0.15")
         Double limiteInferior,

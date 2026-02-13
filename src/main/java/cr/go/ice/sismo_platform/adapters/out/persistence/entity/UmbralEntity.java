@@ -1,6 +1,9 @@
 package cr.go.ice.sismo_platform.adapters.out.persistence.entity;
 
+import cr.go.ice.sismo_platform.adapters.out.persistence.entity.converter.NivelUmbralConverter;
+import cr.go.ice.sismo_platform.domain.model.NivelUmbral;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -29,7 +32,8 @@ public class UmbralEntity {
 
     @Id
     @Column(name = "Cod_umbral", length = 10, nullable = false)
-    private String codUmbral;
+    @Convert(converter = NivelUmbralConverter.class)
+    private NivelUmbral codUmbral;
 
     @Column(name = "limite_inferior")
     private Double limiteInferior;
