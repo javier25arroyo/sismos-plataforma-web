@@ -2,6 +2,7 @@ package cr.go.ice.sismo_platform.adapters.in.web;
 
 import cr.go.ice.sismo_platform.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -20,9 +21,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Testcontainers
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "app.security.enabled=false"
+)
 @AutoConfigureMockMvc
 @Import(SecurityConfig.class)
+@Tag("integration")
 class CentroEstacionIntegrationTest {
 
     @Container
@@ -49,12 +54,15 @@ class CentroEstacionIntegrationTest {
     @BeforeEach
     void setupSchema() {
         jdbcTemplate.execute("IF OBJECT_ID('dbo.Estaciones', 'U') IS NOT NULL DROP TABLE dbo.Estaciones");
-        jdbcTemplate.execute("IF OBJECT_ID('dbo.Centro_Produccion', 'U') IS NOT NULL DROP TABLE dbo.Centro_Produccion");
+        jdbcTemplate.execute("IF OBJECT_ID(N'dbo.Centro_Producción', N'U') IS NOT NULL DROP TABLE dbo.[Centro_Producción]");
 
         jdbcTemplate.execute("""
-                CREATE TABLE dbo.Centro_Produccion (
+                CREATE TABLE dbo.[Centro_Producción] (
                     Cod_Centro_Prd VARCHAR(2) NOT NULL PRIMARY KEY,
-                    Nom_Centro_Prd VARCHAR(30) NOT NULL
+                    Nom_Centro_Prd VARCHAR(30) NOT NULL,
+                    CoordenadaX FLOAT NULL,
+                    CoordenadaY FLOAT NULL,
+                    Grupo_despliegue SMALLINT NULL
                 )
                 """);
 
@@ -69,8 +77,8 @@ class CentroEstacionIntegrationTest {
                 )
                 """);
 
-        jdbcTemplate.update("INSERT INTO dbo.Centro_Produccion (Cod_Centro_Prd, Nom_Centro_Prd) VALUES ('CB', 'C.P. CARIBLANCO')");
-        jdbcTemplate.update("INSERT INTO dbo.Centro_Produccion (Cod_Centro_Prd, Nom_Centro_Prd) VALUES ('AN', 'C.P. ANGOSTURA')");
+        jdbcTemplate.update("INSERT INTO dbo.[Centro_Producción] (Cod_Centro_Prd, Nom_Centro_Prd) VALUES ('CB', 'C.P. CARIBLANCO')");
+        jdbcTemplate.update("INSERT INTO dbo.[Centro_Producción] (Cod_Centro_Prd, Nom_Centro_Prd) VALUES ('AN', 'C.P. ANGOSTURA')");
 
         jdbcTemplate.update("INSERT INTO dbo.Estaciones (Cod_Centro_Prd, Cod_Estacion, Nom_Estacion, CoordenadaX, CoordenadaY) VALUES ('CB', 'BA', 'Base', -84.178, 10.309)");
         jdbcTemplate.update("INSERT INTO dbo.Estaciones (Cod_Centro_Prd, Cod_Estacion, Nom_Estacion, CoordenadaX, CoordenadaY) VALUES ('CB', 'CR', 'Cresta', -84.170, 10.320)");
@@ -85,7 +93,7 @@ class CentroEstacionIntegrationTest {
                         .param("page", "0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].codigo").value("CB"));
+                .andExpect(jsonPath("$.content[0].codCentroPrd").value("CB"));
     }
 
     @Test
@@ -99,6 +107,6 @@ class CentroEstacionIntegrationTest {
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content.length()").value(1))
-                .andExpect(jsonPath("$.content[0].codigoEstacion").value("BA"));
+                .andExpect(jsonPath("$.content[0].codEstacion").value("BA"));
     }
 }

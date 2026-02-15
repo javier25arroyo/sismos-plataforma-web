@@ -12,7 +12,13 @@ import java.time.LocalDateTime;
 public interface RepositorioJpaRepository extends JpaRepository<RepositorioEntity, LocalDateTime> {
 
     @Query("""
-            SELECT r
+            SELECT
+              r.feReporte AS feReporte,
+              r.tituloReporte AS tituloReporte,
+              r.resumen AS resumen,
+              r.url AS url,
+              r.autor AS autor,
+              r.archivo AS archivo
             FROM RepositorioEntity r
             WHERE (:titulo IS NULL OR :titulo = '' OR LOWER(r.tituloReporte) LIKE LOWER(CONCAT('%', :titulo, '%')))
               AND (:autor IS NULL OR :autor = '' OR LOWER(r.autor) LIKE LOWER(CONCAT('%', :autor, '%')))
@@ -20,7 +26,7 @@ public interface RepositorioJpaRepository extends JpaRepository<RepositorioEntit
               AND (:hasta IS NULL OR r.feReporte <= :hasta)
             ORDER BY r.feReporte DESC
             """)
-    Page<RepositorioEntity> search(
+    Page<ReporteProjection> search(
             @Param("titulo") String titulo,
             @Param("autor") String autor,
             @Param("desde") LocalDateTime desde,

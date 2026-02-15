@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(SismoController.class)
+@WebMvcTest(value = SismoController.class, properties = "app.security.enabled=false")
 @Import(SecurityConfig.class)
 @Tag("performance")
 class SismoControllerPerformanceTest {

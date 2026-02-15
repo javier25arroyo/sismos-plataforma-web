@@ -51,8 +51,29 @@ tasks.named('test') {
 	}
 	jvmArgs '-Xshare:off'
 	jvmArgs "-javaagent:${configurations.mockitoAgent.singleFile}"
-	// Exclude integration tests and context-loading tests that require external services in CI/local without DB/Docker
-	exclude '**/*IntegrationTest*', '**/SismoPlatformApplicationTests*'
+	// Keep context-loading test disabled because it depends on external DB configuration.
+	exclude '**/SismoPlatformApplicationTests*'
+	doFirst {
+		def requestedIntegrationByName = filter.commandLineIncludePatterns.any { pattern ->
+			pattern.toLowerCase().contains('integrationtest')
+		}
+		if (!project.hasProperty('runIntegrationTests') && !requestedIntegrationByName) {
+			exclude '**/*IntegrationTest*'
+		}
+	}
+}
+
+tasks.register('integrationTest', Test) {
+	description = 'Runs integration tests backed by external dependencies (e.g. Testcontainers).'
+	group = 'verification'
+	testClassesDirs = sourceSets.test.output.classesDirs
+	classpath = sourceSets.test.runtimeClasspath
+	useJUnitPlatform {
+		includeTags 'integration'
+	}
+	jvmArgs '-Xshare:off'
+	jvmArgs "-javaagent:${configurations.mockitoAgent.singleFile}"
+	shouldRunAfter tasks.named('test')
 }
 
 tasks.register('performanceTest', Test) {

@@ -1,6 +1,7 @@
 package cr.go.ice.sismo_platform.adapters.in.web;
 
 import cr.go.ice.sismo_platform.adapters.in.web.dto.ReporteResponse;
+import cr.go.ice.sismo_platform.adapters.in.web.dto.PageResponse;
 import cr.go.ice.sismo_platform.application.port.in.ReporteQuery;
 import cr.go.ice.sismo_platform.domain.model.ReporteRepositorio;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ProblemDetail;
@@ -61,14 +61,12 @@ public class ReporteController {
                                                   "autor": "RSN"
                                                 }
                                               ],
-                                              "pageable": { "pageNumber": 0, "pageSize": 10 },
+                                              "page": 0,
+                                              "size": 10,
                                               "totalElements": 1,
                                               "totalPages": 1,
-                                              "last": true,
-                                              "size": 10,
-                                              "number": 0,
-                                              "sort": { "sorted": false, "unsorted": true, "empty": true },
                                               "first": true,
+                                              "last": true,
                                               "numberOfElements": 1,
                                               "empty": false
                                             }
@@ -87,14 +85,15 @@ public class ReporteController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))
             )
     })
-    public Page<ReporteResponse> listar(
+    public PageResponse<ReporteResponse> listar(
             @Parameter(description = "Filtra por título (contiene)") @RequestParam(required = false) String titulo,
             @Parameter(description = "Filtra por autor (contiene)") @RequestParam(required = false) String autor,
             @Parameter(description = "Fecha desde (ISO-8601)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
             @Parameter(description = "Fecha hasta (ISO-8601)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime hasta,
             Pageable pageable
     ) {
-        return query.listarReportes(titulo, autor, desde, hasta, pageable).map(ReporteController::toResponse);
+        var result = query.listarReportes(titulo, autor, desde, hasta, pageable).map(ReporteController::toResponse);
+        return PageResponse.from(result);
     }
 
     private static ReporteResponse toResponse(ReporteRepositorio reporte) {

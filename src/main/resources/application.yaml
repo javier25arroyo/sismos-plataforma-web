@@ -21,3 +21,9 @@ springdoc:
   swagger-ui:
     path: /swagger-ui
     display-request-duration: true
+app:
+  security:
+    enabled: ${APP_SECURITY_ENABLED:true}
+  admin:
+    username: ${APP_ADMIN_USERNAME:admin_user}
+    password: ${APP_ADMIN_PASSWORD:${ADMIN_PASSWORD:}}

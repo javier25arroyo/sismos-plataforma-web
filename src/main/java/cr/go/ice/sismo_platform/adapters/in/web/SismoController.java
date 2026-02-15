@@ -1,6 +1,7 @@
 package cr.go.ice.sismo_platform.adapters.in.web;
 
 import cr.go.ice.sismo_platform.adapters.in.web.dto.SismoResumenResponse;
+import cr.go.ice.sismo_platform.adapters.in.web.dto.PageResponse;
 import cr.go.ice.sismo_platform.application.port.in.SismoResumenQuery;
 import cr.go.ice.sismo_platform.domain.model.SismoResumen;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ProblemDetail;
@@ -69,14 +69,12 @@ public class SismoController {
                                                   "coordenadaY": 9.9
                                                 }
                                               ],
-                                              "pageable": { "pageNumber": 0, "pageSize": 10 },
+                                              "page": 0,
+                                              "size": 10,
                                               "totalElements": 1,
                                               "totalPages": 1,
-                                              "last": true,
-                                              "size": 10,
-                                              "number": 0,
-                                              "sort": { "sorted": false, "unsorted": true, "empty": true },
                                               "first": true,
+                                              "last": true,
                                               "numberOfElements": 1,
                                               "empty": false
                                             }
@@ -95,7 +93,7 @@ public class SismoController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))
             )
     })
-    public Page<SismoResumenResponse> resumenUltimoSismo(
+    public PageResponse<SismoResumenResponse> resumenUltimoSismo(
             @Parameter(description = "Código del centro de producción") @RequestParam(required = false) String codCentroPrd,
             @Parameter(description = "Código de estación") @RequestParam(required = false) String codEstacion,
             @Parameter(description = "Fecha desde (ISO-8601)") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime desde,
@@ -104,8 +102,9 @@ public class SismoController {
             @Parameter(description = "Magnitud máxima") @RequestParam(required = false) Double magnitudMax,
             Pageable pageable
     ) {
-        return query.obtenerResumenUltimoSismo(codCentroPrd, codEstacion, desde, hasta, magnitudMin, magnitudMax, pageable)
+        var result = query.obtenerResumenUltimoSismo(codCentroPrd, codEstacion, desde, hasta, magnitudMin, magnitudMax, pageable)
                 .map(SismoController::toResponse);
+        return PageResponse.from(result);
     }
 
     private static SismoResumenResponse toResponse(SismoResumen resumen) {

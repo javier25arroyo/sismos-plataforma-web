@@ -1,6 +1,7 @@
 package cr.go.ice.sismo_platform.adapters.in.web;
 
 import cr.go.ice.sismo_platform.adapters.in.web.dto.CentroProduccionResponse;
+import cr.go.ice.sismo_platform.adapters.in.web.dto.PageResponse;
 import cr.go.ice.sismo_platform.application.usecase.BuscarCentrosProduccionUseCase;
 import cr.go.ice.sismo_platform.application.usecase.BuscarCentrosProduccionUseCase.BuscarCentrosFiltros;
 import cr.go.ice.sismo_platform.domain.model.CentroProduccion;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,7 +40,7 @@ public class CentroController {
      * @param codigo   Prefijo opcional del código del centro para filtrar.
      * @param nombre   Nombre o parte del nombre del centro para filtrar (búsqueda parcial).
      * @param pageable Configuración de paginación (page, size, sort).
-     * @return Una página de objetos {@link CentroProduccionResponse}.
+     * @return Una respuesta paginada de objetos {@link CentroProduccionResponse}.
      */
     @GetMapping
     @Operation(
@@ -61,14 +61,12 @@ public class CentroController {
                                               "content": [
                                                 { "codCentroPrd": "CB", "nomCentroPrd": "C.P. CARIBLANCO" }
                                               ],
-                                              "pageable": { "pageNumber": 0, "pageSize": 10 },
+                                              "page": 0,
+                                              "size": 10,
                                               "totalElements": 1,
                                               "totalPages": 1,
-                                              "last": true,
-                                              "size": 10,
-                                              "number": 0,
-                                              "sort": { "sorted": false, "unsorted": true, "empty": true },
                                               "first": true,
+                                              "last": true,
                                               "numberOfElements": 1,
                                               "empty": false
                                             }
@@ -87,7 +85,7 @@ public class CentroController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))
             )
     })
-    public Page<CentroProduccionResponse> listar(
+    public PageResponse<CentroProduccionResponse> listar(
             @Parameter(description = "Filtra por prefijo del código del centro (ej. 'CH')") 
             @RequestParam(required = false) String codigo,
             
@@ -98,7 +96,8 @@ public class CentroController {
             Pageable pageable
     ) {
         var filtros = new BuscarCentrosFiltros(codigo, nombre, pageable);
-        return buscarCentrosUseCase.ejecutar(filtros).map(CentroController::toResponse);
+        var result = buscarCentrosUseCase.ejecutar(filtros).map(CentroController::toResponse);
+        return PageResponse.from(result);
     }
 
     private static CentroProduccionResponse toResponse(CentroProduccion centro) {

@@ -1,6 +1,7 @@
 package cr.go.ice.sismo_platform.adapters.in.web;
 
 import cr.go.ice.sismo_platform.adapters.in.web.dto.EstacionResponse;
+import cr.go.ice.sismo_platform.adapters.in.web.dto.PageResponse;
 import cr.go.ice.sismo_platform.application.usecase.BuscarEstacionesPorCentroUseCase;
 import cr.go.ice.sismo_platform.application.usecase.BuscarEstacionesPorCentroUseCase.BuscarEstacionesFiltros;
 import cr.go.ice.sismo_platform.domain.model.Estacion;
@@ -11,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -72,14 +72,12 @@ public class EstacionController {
                                                   "coordenadaY": 10.309
                                                 }
                                               ],
-                                              "pageable": { "pageNumber": 0, "pageSize": 10 },
+                                              "page": 0,
+                                              "size": 10,
                                               "totalElements": 1,
                                               "totalPages": 1,
-                                              "last": true,
-                                              "size": 10,
-                                              "number": 0,
-                                              "sort": { "sorted": false, "unsorted": true, "empty": true },
                                               "first": true,
+                                              "last": true,
                                               "numberOfElements": 1,
                                               "empty": false
                                             }
@@ -103,7 +101,7 @@ public class EstacionController {
                     content = @Content(schema = @Schema(implementation = ProblemDetail.class))
             )
     })
-    public Page<EstacionResponse> listar(
+    public PageResponse<EstacionResponse> listar(
             @Parameter(description = "Código del centro de producción") @PathVariable String codigoCentro,
             @Parameter(description = "Filtra por código de estación exacto") @RequestParam(required = false) String codigoEstacion,
             @Parameter(description = "Filtra por nombre (contiene)") @RequestParam(required = false) String nombre,
@@ -115,7 +113,8 @@ public class EstacionController {
     ) {
         var filtros = new BuscarEstacionesFiltros(
             codigoCentro, codigoEstacion, nombre, minX, maxX, minY, maxY, pageable);
-        return buscarEstacionesUseCase.ejecutar(filtros).map(EstacionController::toResponse);
+        var result = buscarEstacionesUseCase.ejecutar(filtros).map(EstacionController::toResponse);
+        return PageResponse.from(result);
     }
 
     private static EstacionResponse toResponse(Estacion estacion) {
