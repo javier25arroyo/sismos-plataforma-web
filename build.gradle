@@ -63,6 +63,10 @@ tasks.named('test') {
 	}
 }
 
+tasks.withType(JavaCompile).configureEach {
+	options.compilerArgs += ['-parameters']
+}
+
 tasks.register('integrationTest', Test) {
 	description = 'Runs integration tests backed by external dependencies (e.g. Testcontainers).'
 	group = 'verification'

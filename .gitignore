@@ -48,3 +48,11 @@ config/application-secrets.yaml
 *.p12
 
 /documentos
+*.jar
+*.lock
+*.log
+*.bin
+*.TAG
+/.gradle-local/caches/modules-2
+/.gradle-local/caches/jars-9/ea2620710a6dca1109cbdc1ad071dbe9/settings
+/.gradle-local

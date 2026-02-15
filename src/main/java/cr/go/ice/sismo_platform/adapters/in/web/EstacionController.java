@@ -102,13 +102,13 @@ public class EstacionController {
             )
     })
     public PageResponse<EstacionResponse> listar(
-            @Parameter(description = "Código del centro de producción") @PathVariable String codigoCentro,
-            @Parameter(description = "Filtra por código de estación exacto") @RequestParam(required = false) String codigoEstacion,
-            @Parameter(description = "Filtra por nombre (contiene)") @RequestParam(required = false) String nombre,
-            @Parameter(description = "Coordenada X mínima") @RequestParam(required = false) Double minX,
-            @Parameter(description = "Coordenada X máxima") @RequestParam(required = false) Double maxX,
-            @Parameter(description = "Coordenada Y mínima") @RequestParam(required = false) Double minY,
-            @Parameter(description = "Coordenada Y máxima") @RequestParam(required = false) Double maxY,
+            @Parameter(description = "Código del centro de producción") @PathVariable("codigoCentro") String codigoCentro,
+            @Parameter(description = "Filtra por código de estación exacto") @RequestParam(name = "codigoEstacion", required = false) String codigoEstacion,
+            @Parameter(description = "Filtra por nombre (contiene)") @RequestParam(name = "nombre", required = false) String nombre,
+            @Parameter(description = "Coordenada X mínima") @RequestParam(name = "minX", required = false) Double minX,
+            @Parameter(description = "Coordenada X máxima") @RequestParam(name = "maxX", required = false) Double maxX,
+            @Parameter(description = "Coordenada Y mínima") @RequestParam(name = "minY", required = false) Double minY,
+            @Parameter(description = "Coordenada Y máxima") @RequestParam(name = "maxY", required = false) Double maxY,
             Pageable pageable
     ) {
         var filtros = new BuscarEstacionesFiltros(
